@@ -1,0 +1,57 @@
+
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id_user   Int    @id @default(autoincrement())
+  nama_user String @db.VarChar(200)
+  password String @db.VarChar(200)
+
+  @@map("tbl_user")
+}
+
+model Kategori {
+  id_kategori   Int      @id @default(autoincrement())
+  nama_kategori String   @db.VarChar(200)
+
+  // relasi
+  produk        Produk[]
+
+  @@map("tbl_kategori")
+}
+
+model Produk {
+  id_produk    Int      @id @default(autoincrement())
+  id_kategori  Int
+  nama_produk  String   @db.VarChar(200)
+  kode_produk  String   @db.VarChar(50)
+  foto_produk  String   @db.VarChar(50)
+  tgl_register DateTime @db.Date
+
+  // relasi
+  kategori Kategori @relation(fields: [id_kategori], references: [id_kategori])
+  stok     Stok[]
+
+  @@index([id_kategori])
+  @@map("tbl_produk")
+}
+
+model Stok {
+  id_stok       Int      @id @default(autoincrement())
+  id_produk     Int
+  jumlah_barang Int
+  tgl_update    DateTime @db.Date
+
+  // relasi
+  produk Produk @relation(fields: [id_produk], references: [id_produk])
+
+  @@index([id_produk])
+  @@map("tbl_stok")
+}
