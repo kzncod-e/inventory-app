@@ -6,15 +6,23 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { registerUser } from "@/lib/user";
+import { log } from "console";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
+  const router = useRouter();
+  const [name, setName] = useState("");
   const [password, setPassword] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log("Login attempt:", { email, password });
+    try {
+      registerUser(name, password);
+      router.push("/");
+    } catch (error) {
+      console.log("Error during registration:", error);
+    }
   };
 
   return (
@@ -44,7 +52,7 @@ export default function LoginPage() {
             <h1
               className="text-3xl font-bold text-white mb-2"
               style={{ fontFamily: "var(--font-orbitron)" }}>
-              WEB3 PORTAL
+              Ray Inventory
             </h1>
             <p
               className="text-gray-300"
@@ -57,16 +65,16 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <Label
-                htmlFor="email"
+                htmlFor="name"
                 className="text-gray-200 font-medium"
                 style={{ fontFamily: "var(--font-exo)" }}>
-                Email Address
+                username
               </Label>
               <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                id="name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 className="glow-input bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-purple-500 focus:ring-purple-500/50 rounded-lg h-12"
                 placeholder="Enter your email"
                 required
@@ -97,7 +105,7 @@ export default function LoginPage() {
               type="submit"
               className="futuristic-button w-full h-12 text-white font-semibold rounded-lg shadow-lg"
               style={{ fontFamily: "var(--font-orbitron)" }}>
-              CONNECT TO WEB3
+              Register
             </Button>
           </form>
 
@@ -106,17 +114,15 @@ export default function LoginPage() {
             <a
               href="#"
               className="text-gray-300 hover:text-purple-400 transition-colors text-sm"
-              style={{ fontFamily: "var(--font-exo)" }}>
-              Forgot your password?
-            </a>
+              style={{ fontFamily: "var(--font-exo)" }}></a>
             <div
               className="text-gray-400 text-sm"
               style={{ fontFamily: "var(--font-exo)" }}>
-              New to Web3?{" "}
+              have an account?{" "}
               <a
                 href="#"
                 className="text-purple-400 hover:text-purple-300 transition-colors">
-                Create wallet
+                Sign in
               </a>
             </div>
           </div>
