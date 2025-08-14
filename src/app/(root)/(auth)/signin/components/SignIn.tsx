@@ -6,11 +6,12 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { registerUser } from "@/lib/user";
+import { loginUser, registerUser } from "@/lib/user";
 
 import { useRouter } from "next/navigation";
+import { log } from "console";
 
-export default function SignUp() {
+export default function LoginPage() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
@@ -18,10 +19,13 @@ export default function SignUp() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await registerUser(name, password);
+      console.log(name, password);
+
+      const res = await loginUser(name, password); // pakai await
+
       router.push("/");
-    } catch (error) {
-      console.log("Error during registration:", error);
+    } catch (error: any) {
+      console.log("Error during login:", error.message);
     }
   };
 
@@ -105,7 +109,7 @@ export default function SignUp() {
               type="submit"
               className="futuristic-button w-full h-12 text-white font-semibold rounded-lg shadow-lg"
               style={{ fontFamily: "var(--font-orbitron)" }}>
-              Register
+              Login
             </Button>
           </form>
 
@@ -118,11 +122,11 @@ export default function SignUp() {
             <div
               className="text-gray-400 text-sm"
               style={{ fontFamily: "var(--font-exo)" }}>
-              have an account?{" "}
+              don't have an account?{" "}
               <a
-                href="/signin"
+                href="/signup"
                 className="text-purple-400 hover:text-purple-300 transition-colors">
-                Sign in
+                Sign up
               </a>
             </div>
           </div>

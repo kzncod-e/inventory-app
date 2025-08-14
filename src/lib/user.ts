@@ -2,7 +2,7 @@ export async function registerUser(nama_user: string, password: string) {
   if (!nama_user || !password) {
     throw new Error("Nama user and password are required");
   }
-  const response = await fetch("api/user", {
+  const response = await fetch("api/register", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -12,15 +12,19 @@ export async function registerUser(nama_user: string, password: string) {
       password,
     }),
   });
-  return response.json();
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || "register failed");
+  }
+  return data.message;
 }
 
 export async function loginUser(nama_user: string, password: string) {
   if (!nama_user || !password) {
     throw new Error("Nama user and password are required");
   }
-  const response = await fetch("api/user", {
-    method: "GET",
+  const response = await fetch("api/login", {
+    method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
@@ -29,5 +33,9 @@ export async function loginUser(nama_user: string, password: string) {
       password,
     }),
   });
-  return response.json();
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || "Login failed");
+  }
+  return data.message;
 }
