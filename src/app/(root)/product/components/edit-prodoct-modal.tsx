@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/select";
 import { X, Upload, GripVertical } from "lucide-react";
 import { Kategori, Product, Produk } from "@/types/type";
+import { uploadFiles } from "@/lib/uploadthing";
 
 interface EditProductFormData {
   id_produk: string | undefined;
@@ -54,6 +55,8 @@ export function EditProductModal({
     kategori: "",
     foto_produk: [],
   });
+  const [uploadedImages, setUploadedImages] = useState<File[]>([]);
+  const [imagesUrls, setImagesUrls] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [uniqueCategories, setUniqueCategories] = useState<Kategori[]>([]);
@@ -84,34 +87,55 @@ export function EditProductModal({
       alert("Please upload at least 3 images");
       return;
     }
+    try {
+      console.log(uploadedImages, "uploaded images");
 
-    setIsLoading(true);
+      const result = await uploadFiles("imageUploader", {
+        files: uploadedImages, // File[]
+      });
+      console.log(result, "upload result");
+      let urls: string[] = [];
+      if (result.length !== 0) {
+        urls = result.map((el) => el.ufsUrl);
+        setImagesUrls(urls);
+      }
 
-    onSubmit(
-      formData.kategori ?? "",
-      formData.nama_produk ?? "",
-      formData.id_produk ?? "",
-      formData.foto_produk ?? []
-    );
-
-    setIsLoading(false);
-    onClose();
+      if (urls.length > 0) {
+        onSubmit(
+          formData.kategori ?? "",
+          formData.nama_produk ?? "",
+          formData.id_produk ?? "",
+          urls
+        );
+      } // Uncomment when ready
+    } catch (error: any) {
+      console.log("error happen while creating new product", error.message);
+    } finally {
+      setUploadedImages([]);
+      setIsLoading(false);
+      onClose();
+    }
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    files.forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setFormData((prev) => ({
-          ...prev,
-          foto_produk: [
-            ...(prev.foto_produk ?? []),
-            e.target?.result as string,
-          ],
-        }));
-      };
-      reader.readAsDataURL(file);
+    setUploadedImages((prev) => [...prev, ...files]);
+
+    Promise.all(
+      files.map(
+        (file) =>
+          new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target?.result as string);
+            reader.onerror = (err) => reject(err);
+            reader.readAsDataURL(file);
+          })
+      )
+    ).then((images) => {
+      setFormData((prev) => ({
+        ...prev,
+        foto_produk: [...prev.foto_produk, ...images],
+      }));
     });
   };
 
@@ -180,7 +204,7 @@ export function EditProductModal({
                     uniqueCategories.map((category, index) => (
                       <SelectItem
                         key={category.id_kategori}
-                        value={category.nama_kategori}>
+                        value={category.id_kategori.toString()}>
                         {category.nama_kategori}
                       </SelectItem>
                     ))}
