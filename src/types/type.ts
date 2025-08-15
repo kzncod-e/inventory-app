@@ -28,3 +28,11 @@ export type Product = Omit<
   Produk,
   "id_produk" | "tgl_register" | "kode_produk" | "stok"
 >;
+
+export type ProdukSortField =
+  | "id_produk"
+  | "id_kategori"
+  | "nama_kategori"
+  | "nama_produk"
+  | "kode_produk"
+  | "tgl_register";

@@ -87,6 +87,7 @@ export function EditProductModal({
       alert("Please upload at least 3 images");
       return;
     }
+    setIsLoading(true);
     try {
       console.log(uploadedImages, "uploaded images");
 
