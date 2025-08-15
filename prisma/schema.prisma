@@ -31,8 +31,9 @@ model Produk {
   id_produk    Int      @id @default(autoincrement())
   id_kategori  Int
   nama_produk  String   @db.VarChar(200)
-  kode_produk  String[]   @db.VarChar(50)
-  foto_produk  String   @db.VarChar(50)
+  kode_produk  String   @db.VarChar(50) @default("TEMP")
+
+  foto_produk  String[]   @db.VarChar(200)
   tgl_register DateTime @db.Date
 
   // relasi

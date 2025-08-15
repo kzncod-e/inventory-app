@@ -2,27 +2,19 @@
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import Sidebar from "@/components/Sidebar";
+import Navbar from "@/components/Navbar";
 
 export default function DashboardPage() {
   const [activeCategory, setActiveCategory] = useState("electronics");
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   return (
-    <div className="min-h-screen neon-gradient-bg flex">
+    <div className="min-h-screen neon-gradient-bg ">
       {/* Animated background overlay */}
       <div className="absolute inset-0 bg-black/20" />
-
-      <Sidebar
-        isOpen={sidebarOpen}
-        onToggle={() => setSidebarOpen(!sidebarOpen)}
-        activeCategory={activeCategory}
-        onCategoryChange={setActiveCategory}
-      />
-
+      <Navbar />
       <div
-        className={`relative z-10 flex-1 p-4 transition-all duration-300 ${
-          sidebarOpen ? "ml-0" : "ml-0"
-        }`}>
+        className={`relative z-10 w-full overflow-hidden p-4 transition-all duration-300 ${"ml-0"}`}>
         <div className="glassmorphism rounded-2xl p-8 shadow-2xl h-full">
           <div className="mt-8">
             {/* Header */}

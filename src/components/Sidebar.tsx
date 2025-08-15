@@ -7,12 +7,7 @@ interface SidebarProps {
   onCategoryChange: (category: string) => void;
 }
 
-export default function Sidebar({
-  isOpen,
-  onToggle,
-  activeCategory,
-  onCategoryChange,
-}: SidebarProps) {
+export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
   const categories = [
     { id: "electronics", name: "Electronics", icon: "⚡" },
     { id: "clothing", name: "Clothing", icon: "👕" },

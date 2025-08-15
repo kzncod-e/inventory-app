@@ -1,6 +1,7 @@
 export type Kategori = {
   id_kategori: number;
   nama_kategori: string;
+  produk: Produk[];
 };
 
 export type Stok = {
@@ -15,7 +16,7 @@ export type Produk = {
   id_kategori: number;
   nama_produk: string;
   kode_produk?: string;
-  foto_produk: string;
+  foto_produk: string[];
   tgl_register: string; // ISO date format
   kategori?: Kategori; // optional jika include relasi
   stok?: Stok[]; // optional jika include relasi

@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const { id_kategori, nama_produk, foto_produk } = body;
@@ -76,4 +76,33 @@ export async function GET() {
       headers: { "Content-Type": "application/json" },
     }
   );
+}
+export async function PUT(req: NextRequest) {
+  try {
+    const body = await req.json();
+    const { id_produk, id_kategori, nama_produk } = body;
+
+    // Update produk
+    const updatedProduk = await prisma.produk.update({
+      where: { id_produk },
+      data: {
+        id_kategori,
+        nama_produk,
+      },
+    });
+
+    return NextResponse.json(
+      {
+        message: "Produk berhasil diperbarui",
+        data: updatedProduk,
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json(
+      { message: "Terjadi kesalahan pada server" },
+      { status: 500 }
+    );
+  }
 }

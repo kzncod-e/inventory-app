@@ -6,7 +6,7 @@ async function main() {
   console.log("🌱 Seeding database...");
 
   // 1. Users
-  const user1 = await prisma.user.create({
+  await prisma.user.create({
     data: {
       nama_user: "Admin",
       password: "admin123",
@@ -26,13 +26,15 @@ async function main() {
     data: { nama_kategori: "Food" },
   });
 
-  // 3. Products
+  // 3. Products dengan foto array
   const laptopProduct = await prisma.produk.create({
     data: {
       id_kategori: electronicsCategory.id_kategori,
       nama_produk: "Asus ROG Laptop",
       kode_produk: "EL001",
-      foto_produk: "laptop_asus.jpg",
+      foto_produk: [
+        "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcREiXss_pkIwnX0B2FKNI1swYLKUM0V3vcdj_UkXiu3qezpE9L1d8yu9aY6t8gnvkrH8SPrDi9BjqeCL4bBEA-N03UzrEKkQHH_6rQ9af00RQ",
+      ],
       tgl_register: new Date("2025-01-10"),
     },
   });
@@ -42,7 +44,9 @@ async function main() {
       id_kategori: clothingCategory.id_kategori,
       nama_produk: "Black Plain T-Shirt",
       kode_produk: "CL001",
-      foto_produk: "black_tshirt.jpg",
+      foto_produk: [
+        "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcREiXss_pkIwnX0B2FKNI1swYLKUM0V3vcdj_UkXiu3qezpE9L1d8yu9aY6t8gnvkrH8SPrDi9BjqeCL4bBEA-N03UzrEKkQHH_6rQ9af00RQ",
+      ],
       tgl_register: new Date("2025-02-05"),
     },
   });
@@ -52,7 +56,9 @@ async function main() {
       id_kategori: foodCategory.id_kategori,
       nama_produk: "Potato Chips",
       kode_produk: "FD001",
-      foto_produk: "chips.jpg",
+      foto_produk: [
+        "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcREiXss_pkIwnX0B2FKNI1swYLKUM0V3vcdj_UkXiu3qezpE9L1d8yu9aY6t8gnvkrH8SPrDi9BjqeCL4bBEA-N03UzrEKkQHH_6rQ9af00RQ",
+      ],
       tgl_register: new Date("2025-03-15"),
     },
   });

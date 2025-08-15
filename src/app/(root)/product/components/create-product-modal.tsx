@@ -37,13 +37,17 @@ export function CreateProductModal({
   onSubmit,
   categories,
 }: CreateProductModalProps) {
-  const [formData, setFormData] = useState<Product>();
+  const [formData, setFormData] = useState<Product>({
+    nama_produk: "",
+    id_kategori: 0,
+    foto_produk: [],
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData?.foto_produk) {
+    if (formData?.foto_produk.length < 3) {
       alert("Please upload at least 3 images");
       return;
     }
@@ -55,7 +59,7 @@ export function CreateProductModal({
     setFormData({
       nama_produk: "",
       id_kategori: 0,
-      foto_produk: "",
+      foto_produk: [],
     });
     setIsLoading(false);
     onClose();
@@ -68,7 +72,7 @@ export function CreateProductModal({
       reader.onload = (e) => {
         setFormData((prev) => ({
           ...prev,
-          images: [...prev.images, e.target?.result as string],
+          foto_produk: [...prev?.foto_produk, e.target?.result as string],
         }));
       };
       reader.readAsDataURL(file);
@@ -78,7 +82,7 @@ export function CreateProductModal({
   const removeImage = (index: number) => {
     setFormData((prev) => ({
       ...prev,
-      images: prev.images.filter((_, i) => i !== index),
+      foto_produk: prev.foto_produk.filter((_, i) => i !== index),
     }));
   };
 
@@ -90,12 +94,12 @@ export function CreateProductModal({
     e.preventDefault();
     if (draggedIndex === null) return;
 
-    const newImages = [...formData.images];
+    const newImages = [...formData.foto_produk];
     const draggedImage = newImages[draggedIndex];
     newImages.splice(draggedIndex, 1);
     newImages.splice(index, 0, draggedImage);
 
-    setFormData((prev) => ({ ...prev, images: newImages }));
+    setFormData((prev) => ({ ...prev, foto_produk: newImages }));
     setDraggedIndex(index);
   };
 
@@ -113,9 +117,12 @@ export function CreateProductModal({
             <div>
               <Label className="text-purple-300">Product Name</Label>
               <Input
-                value={formData.name}
+                value={formData.nama_produk}
                 onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, name: e.target.value }))
+                  setFormData((prev) => ({
+                    ...prev,
+                    nama_produk: e.target.value,
+                  }))
                 }
                 className="bg-black/50 border-purple-500/30 text-white focus:border-purple-400 focus:ring-purple-400/20"
                 required
@@ -124,9 +131,12 @@ export function CreateProductModal({
             <div>
               <Label className="text-purple-300">Category</Label>
               <Select
-                value={formData.category}
+                value={formData.id_kategori.toString()}
                 onValueChange={(value) =>
-                  setFormData((prev) => ({ ...prev, category: value }))
+                  setFormData((prev) => ({
+                    ...prev,
+                    id_kategori: Number(value),
+                  }))
                 }>
                 <SelectTrigger className="bg-black/50 border-purple-500/30 text-white">
                   <SelectValue placeholder="Select category" />
@@ -135,7 +145,7 @@ export function CreateProductModal({
                   {categories.map((category) => (
                     <SelectItem
                       key={category.id_kategori}
-                      value={category.nama_kategori}>
+                      value={category.id_kategori.toString()}>
                       {category.nama_kategori}
                     </SelectItem>
                   ))}
@@ -185,14 +195,14 @@ export function CreateProductModal({
               </label>
             </div>
 
-            {formData.images.length > 0 && (
+            {formData.foto_produk.length > 0 && (
               <div className="mt-4">
                 <p className="text-sm text-purple-300 mb-2">
-                  Uploaded Images ({formData.images.length}/3 minimum) - Drag to
-                  reorder
+                  Uploaded Images ({formData.foto_produk.length}/3 minimum) -
+                  Drag to reorder
                 </p>
                 <div className="grid grid-cols-3 gap-2">
-                  {formData.images.map((image, index) => (
+                  {formData.foto_produk.map((image, index) => (
                     <div
                       key={index}
                       draggable
@@ -231,7 +241,7 @@ export function CreateProductModal({
             </Button>
             <Button
               type="submit"
-              disabled={isLoading || formData.images.length < 3}
+              disabled={isLoading || formData.foto_produk.length < 3}
               className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg shadow-purple-500/25">
               {isLoading ? "Creating..." : "Create Product"}
             </Button>
