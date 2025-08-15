@@ -76,3 +76,23 @@ export async function deleteCategory(id_kategori: string) {
     return null;
   }
 }
+
+export async function updateStok(id_produk: string, jumlah_barang: number) {
+  try {
+    const res = await fetch(`/api/stok`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ id_produk, jumlah_barang }),
+    });
+    if (!res.ok) {
+      throw new Error("Failed to update stock");
+    }
+    const stok = await res.json();
+    return stok.data;
+  } catch (error: any) {
+    console.error(error.message);
+    return null;
+  }
+}

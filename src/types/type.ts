@@ -10,7 +10,10 @@ export type Stok = {
   jumlah_barang: number;
   tgl_update: string; // pakai string untuk JSON (ISO date)
 };
-
+export type StokReq = {
+  id_produk: number;
+  jumlah_barang: number;
+};
 export type Produk = {
   id_produk: number;
   id_kategori: number;

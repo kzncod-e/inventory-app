@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Dialog,
   DialogContent,
@@ -21,61 +21,78 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { X, Upload, GripVertical } from "lucide-react";
+import { Kategori, Product, Produk } from "@/types/type";
 
+interface EditProductFormData {
+  id_produk: string | undefined;
+  nama_produk: string | undefined;
+  kategori: string | undefined;
+  foto_produk: string[] | undefined;
+}
 interface EditProductModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (product: any) => void;
-  product: any;
+  onSubmit: (
+    id_kategori: string,
+    nama_produk: string,
+    id_produk: string,
+    foto_produk: string[]
+  ) => void;
+  product: Partial<Produk>;
+  categories: Kategori[];
 }
-
 export function EditProductModal({
   isOpen,
   onClose,
   onSubmit,
   product,
+  categories,
 }: EditProductModalProps) {
-  const [formData, setFormData] = useState({
-    name: "",
-    category: "",
-    price: "",
-    stock: "",
-    description: "",
-    images: [] as string[],
+  const [formData, setFormData] = useState<EditProductFormData>({
+    id_produk: "",
+    nama_produk: "",
+    kategori: "",
+    foto_produk: [],
   });
   const [isLoading, setIsLoading] = useState(false);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
-
+  const [uniqueCategories, setUniqueCategories] = useState<Kategori[]>([]);
   useEffect(() => {
     if (product) {
       setFormData({
-        name: product.name || "",
-        category: product.category || "",
-        price: product.price?.toString() || "",
-        stock: product.stock?.toString() || "",
-        description: product.description || "",
-        images: product.images || [],
+        id_produk: product.id_produk?.toString() ?? "",
+        nama_produk: product.nama_produk,
+        kategori: product.kategori?.nama_kategori,
+        foto_produk: product.foto_produk,
       });
     }
-  }, [product]);
+    if (categories && categories.length > 0) {
+      setUniqueCategories(() => {
+        return categories.filter(
+          (cat, index, self) =>
+            index === self.findIndex((c) => c.id_kategori === cat.id_kategori)
+        );
+      });
+    }
+  }, [product, categories]);
+  console.log("ini categories halaman edit:", categories);
+  console.log("product:", product);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.images.length < 3) {
+    if ((formData.foto_produk?.length ?? 0) < 3) {
       alert("Please upload at least 3 images");
       return;
     }
 
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
 
-    onSubmit({
-      ...product,
-      ...formData,
-      price: Number.parseFloat(formData.price),
-      stock: Number.parseInt(formData.stock),
-      status: Number.parseInt(formData.stock) > 0 ? "In Stock" : "Out of Stock",
-    });
+    onSubmit(
+      formData.kategori ?? "",
+      formData.nama_produk ?? "",
+      formData.id_produk ?? "",
+      formData.foto_produk ?? []
+    );
 
     setIsLoading(false);
     onClose();
@@ -88,7 +105,10 @@ export function EditProductModal({
       reader.onload = (e) => {
         setFormData((prev) => ({
           ...prev,
-          images: [...prev.images, e.target?.result as string],
+          foto_produk: [
+            ...(prev.foto_produk ?? []),
+            e.target?.result as string,
+          ],
         }));
       };
       reader.readAsDataURL(file);
@@ -98,7 +118,7 @@ export function EditProductModal({
   const removeImage = (index: number) => {
     setFormData((prev) => ({
       ...prev,
-      images: prev.images.filter((_, i) => i !== index),
+      foto_produk: (prev.foto_produk ?? []).filter((_, i) => i !== index),
     }));
   };
 
@@ -110,12 +130,12 @@ export function EditProductModal({
     e.preventDefault();
     if (draggedIndex === null) return;
 
-    const newImages = [...formData.images];
+    const newImages = [...(formData.foto_produk ?? [])];
     const draggedImage = newImages[draggedIndex];
     newImages.splice(draggedIndex, 1);
     newImages.splice(index, 0, draggedImage);
 
-    setFormData((prev) => ({ ...prev, images: newImages }));
+    setFormData((prev) => ({ ...prev, foto_produk: newImages }));
     setDraggedIndex(index);
   };
 
@@ -133,9 +153,12 @@ export function EditProductModal({
             <div>
               <Label className="text-purple-300">Product Name</Label>
               <Input
-                value={formData.name}
+                value={formData.nama_produk}
                 onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, name: e.target.value }))
+                  setFormData((prev) => ({
+                    ...prev,
+                    nama_produk: e.target.value,
+                  }))
                 }
                 className="bg-black/50 border-purple-500/30 text-white focus:border-purple-400 focus:ring-purple-400/20"
                 required
@@ -144,66 +167,29 @@ export function EditProductModal({
             <div>
               <Label className="text-purple-300">Category</Label>
               <Select
-                value={formData.category}
+                value={formData.kategori}
                 onValueChange={(value) =>
-                  setFormData((prev) => ({ ...prev, category: value }))
+                  setFormData((prev) => ({ ...prev, kategori: value }))
                 }>
                 <SelectTrigger className="bg-black/50 border-purple-500/30 text-white">
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
                 <SelectContent className="bg-black/90 border-purple-500/30">
-                  <SelectItem value="Electronics">Electronics</SelectItem>
-                  <SelectItem value="Clothing">Clothing</SelectItem>
-                  <SelectItem value="Books">Books</SelectItem>
-                  <SelectItem value="Home">Home</SelectItem>
-                  <SelectItem value="Sports">Sports</SelectItem>
+                  {uniqueCategories &&
+                    uniqueCategories.length > 0 &&
+                    uniqueCategories.map((category, index) => (
+                      <SelectItem
+                        key={category.id_kategori}
+                        value={category.nama_kategori}>
+                        {category.nama_kategori}
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label className="text-purple-300">Price ($)</Label>
-              <Input
-                type="number"
-                step="0.01"
-                value={formData.price}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, price: e.target.value }))
-                }
-                className="bg-black/50 border-purple-500/30 text-white focus:border-purple-400 focus:ring-purple-400/20"
-                required
-              />
-            </div>
-            <div>
-              <Label className="text-purple-300">Stock Quantity</Label>
-              <Input
-                type="number"
-                value={formData.stock}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, stock: e.target.value }))
-                }
-                className="bg-black/50 border-purple-500/30 text-white focus:border-purple-400 focus:ring-purple-400/20"
-                required
-              />
-            </div>
-          </div>
-
-          <div>
-            <Label className="text-purple-300">Description</Label>
-            <Textarea
-              value={formData.description}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  description: e.target.value,
-                }))
-              }
-              className="bg-black/50 border-purple-500/30 text-white focus:border-purple-400 focus:ring-purple-400/20 min-h-[100px]"
-              required
-            />
-          </div>
+          <div className="grid grid-cols-2 gap-4"></div>
 
           <div>
             <Label className="text-purple-300">
@@ -231,14 +217,14 @@ export function EditProductModal({
               </label>
             </div>
 
-            {formData.images.length > 0 && (
+            {(formData.foto_produk?.length ?? 0) > 0 && (
               <div className="mt-4">
                 <p className="text-sm text-purple-300 mb-2">
-                  Product Images ({formData.images.length}/3 minimum) - Drag to
-                  reorder
+                  Product Images ({formData.foto_produk?.length ?? 0}/3 minimum)
+                  - Drag to reorder
                 </p>
                 <div className="grid grid-cols-3 gap-2">
-                  {formData.images.map((image, index) => (
+                  {(formData.foto_produk ?? []).map((image, index) => (
                     <div
                       key={index}
                       draggable
@@ -277,7 +263,7 @@ export function EditProductModal({
             </Button>
             <Button
               type="submit"
-              disabled={isLoading || formData.images.length < 3}
+              disabled={isLoading || (formData.foto_produk?.length ?? 0) < 3}
               className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg shadow-purple-500/25">
               {isLoading ? "Updating..." : "Update Product"}
             </Button>

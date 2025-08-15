@@ -80,7 +80,7 @@ export async function GET() {
 export async function PUT(req: NextRequest) {
   try {
     const body = await req.json();
-    const { id_produk, id_kategori, nama_produk } = body;
+    const { id_produk, id_kategori, nama_produk, foto_produk } = body;
 
     // Update produk
     const updatedProduk = await prisma.produk.update({
@@ -88,6 +88,7 @@ export async function PUT(req: NextRequest) {
       data: {
         id_kategori,
         nama_produk,
+        foto_produk,
       },
     });
 

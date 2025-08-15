@@ -18,9 +18,12 @@ import { CreateProductModal } from "./components/create-product-modal";
 import { EditProductModal } from "./components/edit-prodoct-modal";
 import { UpdateStockModal } from "./components/update-stock-modal";
 import { DeleteConfirmationModal } from "./components/delete-confirmation-modal";
-import { createProduct, getProduct } from "@/lib/product";
-import { log } from "console";
-import { Kategori, Product, Produk } from "@/types/type";
+import { createProduct, getProduct, updateProduct } from "@/lib/product";
+
+import { Kategori, Product, Produk, StokReq } from "@/types/type";
+import Navbar from "@/components/Navbar";
+import { updateStok } from "@/lib/category";
+import { get } from "http";
 
 export default function ProductManagement() {
   const [products, setProducts] = useState<Produk[]>([]);
@@ -31,7 +34,7 @@ export default function ProductManagement() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isStockModalOpen, setIsStockModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [selectedProduct, setSelectedProduct] = useState<Produk>();
   const getAllProduct = async () => {
     try {
       const res = await getProduct();
@@ -45,8 +48,6 @@ export default function ProductManagement() {
   useEffect(() => {
     getAllProduct();
   }, []);
-  console.log(products, "ini productsi");
-  console.log(category, "ini category");
 
   const filteredProducts = products.filter(
     (product) =>
@@ -60,52 +61,64 @@ export default function ProductManagement() {
     try {
       const res = await createProduct(newProduct);
       console.log("success while creating new product", res);
+      await getAllProduct(); // Refresh product list after creation
     } catch (error: any) {
       console.log("error while createing new product", error.message);
     }
   };
 
-  const handleEditProduct = (updatedProduct: any) => {
-    setProducts((prev) =>
-      prev.map((p) => (p.id_produk === updatedProduct.id ? updatedProduct : p))
-    );
+  const handleEditProduct = async (
+    id_kategori: string,
+    id_produk: string,
+    nama_produk: string,
+    foto_produk: string[]
+  ) => {
+    try {
+      const res = await updateProduct(
+        id_kategori,
+        id_produk,
+        nama_produk,
+        foto_produk
+      );
+      console.log("success while updating product", res);
+      await getAllProduct(); // Refresh product list after updating
+    } catch (error: any) {
+      console.log("error while updating product", error.message);
+    }
   };
 
-  const handleUpdateStock = (productId: number, newStock: number) => {
-    setProducts((prev) =>
-      prev.map((p) =>
-        p.id_produk === productId
-          ? {
-              ...p,
-              stock: newStock,
-              status: newStock > 0 ? "In Stock" : "Out of Stock",
-            }
-          : p
-      )
-    );
+  const handleUpdateStock = async ({ id_produk, jumlah_barang }: StokReq) => {
+    try {
+      const res = await updateStok(id_produk.toString(), jumlah_barang);
+      console.log("success while updating stock", res);
+      await getAllProduct();
+    } catch (error: any) {
+      console.log("error while updating stock", error.message);
+    }
   };
 
   const handleDeleteProduct = (productId: number) => {
     setProducts((prev) => prev.filter((p) => p.id_produk !== productId));
   };
 
-  const openEditModal = (product: any) => {
+  const openEditModal = (product: Produk) => {
     setSelectedProduct(product);
     setIsEditModalOpen(true);
   };
 
-  const openStockModal = (product: any) => {
+  const openStockModal = (product: Produk) => {
     setSelectedProduct(product);
     setIsStockModalOpen(true);
   };
 
-  const openDeleteModal = (product: any) => {
+  const openDeleteModal = (product: Produk) => {
     setSelectedProduct(product);
     setIsDeleteModalOpen(true);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-6">
+    <div className="min-h-screen w-full bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 ">
+      <Navbar className="mb-3 pt-3" />
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -239,7 +252,8 @@ export default function ProductManagement() {
           isOpen={isEditModalOpen}
           onClose={() => setIsEditModalOpen(false)}
           onSubmit={handleEditProduct}
-          product={selectedProduct}
+          product={selectedProduct ?? {}}
+          categories={category}
         />
 
         <UpdateStockModal

@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+
 import {
   Select,
   SelectContent,
@@ -22,7 +22,8 @@ import {
 } from "@/components/ui/select";
 import { X, Upload, GripVertical } from "lucide-react";
 import { Kategori, Product } from "@/types/type";
-import { createProduct } from "@/lib/product";
+
+import { uploadFiles } from "@/lib/uploadthing";
 
 interface CreateProductModalProps {
   isOpen: boolean;
@@ -44,6 +45,13 @@ export function CreateProductModal({
   });
   const [isLoading, setIsLoading] = useState(false);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [uploadedImages, setUploadedImages] = useState<File[]>([]);
+  const [imagesUrls, setImagesUrls] = useState<string[]>([]);
+  const uniqueCategories = categories.filter(
+    (cat, index, self) =>
+      index === self.findIndex((c) => c.id_kategori === cat.id_kategori)
+  );
+  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,31 +59,63 @@ export function CreateProductModal({
       alert("Please upload at least 3 images");
       return;
     }
+
+    setIsLoading(true);
+
     try {
-      const res = await createProduct(formData);
+      console.log(uploadedImages, "uploaded images");
+
+      const result = await uploadFiles("imageUploader", {
+        files: uploadedImages, // File[]
+      });
+      console.log(result, "upload result");
+      let urls: string[] = [];
+      if (result.length !== 0) {
+        urls = result.map((el) => el.ufsUrl);
+        setImagesUrls(urls);
+      }
+      console.log(urls, "urls after upload");
+
+      if (urls.length > 0) {
+        onSubmit({
+          nama_produk: formData.nama_produk,
+          id_kategori: formData.id_kategori,
+          foto_produk: urls,
+        });
+      } // Uncomment when ready
     } catch (error: any) {
       console.log("error happen while creating new product", error.message);
+    } finally {
+      setFormData({
+        nama_produk: "",
+        id_kategori: 0,
+        foto_produk: [],
+      });
+      setUploadedImages([]);
+      setIsLoading(false);
+      onClose();
     }
-    setFormData({
-      nama_produk: "",
-      id_kategori: 0,
-      foto_produk: [],
-    });
-    setIsLoading(false);
-    onClose();
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    files.forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setFormData((prev) => ({
-          ...prev,
-          foto_produk: [...prev?.foto_produk, e.target?.result as string],
-        }));
-      };
-      reader.readAsDataURL(file);
+    setUploadedImages((prev) => [...prev, ...files]);
+
+    Promise.all(
+      files.map(
+        (file) =>
+          new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target?.result as string);
+            reader.onerror = (err) => reject(err);
+            reader.readAsDataURL(file);
+          })
+      )
+    ).then((images) => {
+      setFormData((prev) => ({
+        ...prev,
+        foto_produk: [...prev.foto_produk, ...images],
+      }));
     });
   };
 
@@ -102,7 +142,7 @@ export function CreateProductModal({
     setFormData((prev) => ({ ...prev, foto_produk: newImages }));
     setDraggedIndex(index);
   };
-
+  const handleCreateProduct = () => {};
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-black/90 backdrop-blur-xl border border-purple-500/30 text-white">
@@ -142,9 +182,9 @@ export function CreateProductModal({
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
                 <SelectContent className="bg-black/90 text-fuchsia-100 border-purple-500/30">
-                  {categories.map((category) => (
+                  {uniqueCategories.map((category, index) => (
                     <SelectItem
-                      key={category.id_kategori}
+                      key={`category-${index}`}
                       value={category.id_kategori.toString()}>
                       {category.nama_kategori}
                     </SelectItem>
@@ -204,7 +244,7 @@ export function CreateProductModal({
                 <div className="grid grid-cols-3 gap-2">
                   {formData.foto_produk.map((image, index) => (
                     <div
-                      key={index}
+                      key={`image-${index}`}
                       draggable
                       onDragStart={() => handleDragStart(index)}
                       onDragOver={(e) => handleDragOver(e, index)}

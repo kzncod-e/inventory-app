@@ -5,9 +5,6 @@ import Sidebar from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
 
 export default function DashboardPage() {
-  const [activeCategory, setActiveCategory] = useState("electronics");
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-
   return (
     <div className="min-h-screen neon-gradient-bg ">
       {/* Animated background overlay */}
