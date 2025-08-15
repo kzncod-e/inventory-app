@@ -51,7 +51,6 @@ export function CreateProductModal({
     (cat, index, self) =>
       index === self.findIndex((c) => c.id_kategori === cat.id_kategori)
   );
-  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,18 +62,15 @@ export function CreateProductModal({
     setIsLoading(true);
 
     try {
-      console.log(uploadedImages, "uploaded images");
-
       const result = await uploadFiles("imageUploader", {
         files: uploadedImages, // File[]
       });
-      console.log(result, "upload result");
+
       let urls: string[] = [];
       if (result.length !== 0) {
         urls = result.map((el) => el.ufsUrl);
         setImagesUrls(urls);
       }
-      console.log(urls, "urls after upload");
 
       if (urls.length > 0) {
         onSubmit({

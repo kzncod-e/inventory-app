@@ -82,11 +82,6 @@ export async function PUT(req: NextRequest) {
     const body = await req.json();
     const { id_produk, id_kategori, nama_produk, foto_produk } = body;
 
-    console.log("id", id_produk);
-    console.log("kategori", id_kategori);
-    console.log("nama", nama_produk);
-    console.log("foto", foto_produk);
-
     // Update produk
     const updatedProduk = await prisma.produk.update({
       where: { id_produk: Number(id_produk) },

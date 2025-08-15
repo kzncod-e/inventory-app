@@ -46,7 +46,6 @@ export function UpdateStockModal({
       );
     }
   }, [product]);
-  console.log(product, "ini produk");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

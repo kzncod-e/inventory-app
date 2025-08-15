@@ -78,8 +78,6 @@ export function EditProductModal({
       });
     }
   }, [product, categories]);
-  console.log("ini categories halaman edit:", categories);
-  console.log("product:", product);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,7 +92,7 @@ export function EditProductModal({
       const result = await uploadFiles("imageUploader", {
         files: uploadedImages, // File[]
       });
-      console.log(result, "upload result");
+
       let urls: string[] = [];
       if (result.length !== 0) {
         urls = result.map((el) => el.ufsUrl);

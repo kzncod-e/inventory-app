@@ -32,7 +32,6 @@ export type Product = Omit<
 export type ProdukSortField =
   | "id_produk"
   | "id_kategori"
-  |
   | "nama_produk"
   | "kode_produk"
   | "tgl_register";

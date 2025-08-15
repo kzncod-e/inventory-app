@@ -180,17 +180,30 @@ export default function ProductManagement() {
                       className="border-purple-500/20 hover:bg-purple-500/5">
                       <TableCell className="text-white">
                         <div className="flex items-center space-x-3">
-                          <img
-                            src={product.foto_produk[0] || "/placeholder.svg"}
-                            alt={product.nama_produk}
-                            className="w-12 h-12 object-cover rounded border border-purple-500/30"
-                          />
-                          <div>
-                            <div className="font-medium">
-                              {product.nama_produk}
-                            </div>
-                            <div className="text-sm text-purple-300 truncate max-w-xs"></div>
+                          {product.foto_produk.length > 0 ? (
+                            product.foto_produk.map((foto, index) => (
+                              <img
+                                key={index}
+                                src={foto || "/placeholder.svg"}
+                                alt={product.nama_produk}
+                                className="w-12 h-12 object-cover rounded border border-purple-500/30"
+                              />
+                            ))
+                          ) : (
+                            <img
+                              src="/placeholder.svg?height=100&width=100"
+                              alt={product.nama_produk}
+                              className="w-12 h-12 object-cover rounded border border-purple-500/30"
+                            />
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-purple-300">
+                        <div>
+                          <div className="font-medium">
+                            {product.nama_produk}
                           </div>
+                          <div className="text-sm text-purple-300 truncate max-w-xs"></div>
                         </div>
                       </TableCell>
                       <TableCell className="text-purple-300">
