@@ -101,16 +101,18 @@ export default function ReportsPage() {
   const [category, setCategory] = useState<Kategori[]>([]);
   const [sortField, setSortField] = useState<ProdukSortField | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
+  const [loading, setLoading] = useState(false);
 
   // Filter and sort data
   const getAllProduct = async () => {
     try {
+      setLoading(true);
       const res = await getProduct();
       setProducts(res);
-      const categories = res.map((product: Produk) => product.kategori);
-      setCategory(categories);
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
   useEffect(() => {
@@ -145,7 +147,7 @@ export default function ReportsPage() {
     }
 
     return filtered;
-  }, [searchTerm, sortField, sortDirection]);
+  }, [searchTerm, products, sortDirection]);
 
   // Pagination
   const totalPages = Math.ceil(filteredAndSortedData.length / itemsPerPage);
@@ -336,15 +338,15 @@ export default function ReportsPage() {
                         // }>
                       >
                         <div className="flex items-center gap-2">
-                          tgl_register
+                          created_at
                         </div>
                       </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {paginatedData.map((item) => (
+                    {paginatedData.map((item, index) => (
                       <TableRow
-                        key={item.kode_produk}
+                        key={index}
                         className="border-purple-500/10 hover:bg-purple-500/5 transition-colors">
                         <TableCell className="font-mono text-blue-300 font-medium">
                           {item.kode_produk}
@@ -361,7 +363,7 @@ export default function ReportsPage() {
                           {item.stok?.length || 0}
                         </TableCell>
                         <TableCell className="text-gray-300 font-exo">
-                          {item.tgl_register}
+                          {new Date(item.tgl_register).toLocaleString("id-ID")}
                         </TableCell>
                       </TableRow>
                     ))}
