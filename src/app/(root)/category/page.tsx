@@ -116,7 +116,7 @@ export default function CategoryManagement() {
 
   return (
     <>
-      <div className="neon-gradient-bg relative   min-h-screen font-exo">
+      <div className="neon-gradient-bg relative font-orbitron  min-h-screen ">
         <Navbar />
         <div className="container mx-auto px-4 py-8">
           {/* Header */}

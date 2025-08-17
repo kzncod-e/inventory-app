@@ -11,7 +11,7 @@ interface CategoryRowProps {
 const CategoryRow = React.memo(
   ({ category, onEdit, onDelete }: CategoryRowProps) => {
     return (
-      <tr className="border-b border-white/10 hover:bg-white/5 transition-colors">
+      <tr className="border-b font-orbitron border-white/10 hover:bg-white/5 transition-colors">
         <td className="py-4 px-4">
           <span className="text-white font-medium">
             {category.nama_kategori}

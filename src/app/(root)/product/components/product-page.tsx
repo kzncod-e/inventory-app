@@ -137,12 +137,12 @@ export default function ProductManagement() {
   }, []);
 
   return (
-    <div className="min-h-screen w-full neon-gradient-bg ">
+    <div className="min-h-screen  w-full neon-gradient-bg ">
       <Navbar className="mb-3 pt-3" />
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-2">
+          <h1 className="text-4xl font-bold bg-gradient-to-r  from-purple-400 to-blue-400 bg-clip-text text-transparent mb-2">
             Product Management
           </h1>
           <p className="text-purple-300">
@@ -151,7 +151,7 @@ export default function ProductManagement() {
         </div>
 
         {/* Controls */}
-        <Card className="mb-6 glassmorphism backdrop-blur-xl border-purple-500/30">
+        <Card className="mb-6 font-orbitron glassmorphism backdrop-blur-xl border-purple-500/30">
           <CardContent className="p-6">
             <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
               <div className="relative flex-1 max-w-md">
@@ -174,7 +174,7 @@ export default function ProductManagement() {
         </Card>
 
         {/* Products Table */}
-        <Card className="glassmorphism backdrop-blur-xl border-purple-500/30">
+        <Card className="glassmorphism  font-orbitron backdrop-blur-xl border-purple-500/30">
           <CardHeader>
             <CardTitle className="text-white">
               Products ({filteredProducts.length})
