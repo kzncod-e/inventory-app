@@ -56,57 +56,72 @@ export function EditProductModal({
     foto_produk: [],
   });
   const [uploadedImages, setUploadedImages] = useState<File[]>([]);
-  const [imagesUrls, setImagesUrls] = useState<string[]>([]);
+  // const [imagesUrls, setImagesUrls] = useState<string[]>([]);
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [uniqueCategories, setUniqueCategories] = useState<Kategori[]>([]);
+  // state tambahan untuk preview
+
   useEffect(() => {
     if (product) {
       setFormData({
         id_produk: product.id_produk?.toString() ?? "",
         nama_produk: product.nama_produk,
         kategori: product.kategori?.nama_kategori,
-        foto_produk: product.foto_produk,
+        foto_produk: product.foto_produk || [], // hanya URL dari DB/server
       });
+
+      // reset preview kalau sudah ada product
+      setPreviewUrls([]);
+      setUploadedImages([]);
     }
+
     if (categories && categories.length > 0) {
-      setUniqueCategories(() => {
-        return categories.filter(
+      setUniqueCategories(() =>
+        categories.filter(
           (cat, index, self) =>
             index === self.findIndex((c) => c.id_kategori === cat.id_kategori)
-        );
-      });
+        )
+      );
     }
   }, [product, categories]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if ((formData.foto_produk?.length ?? 0) < 3) {
+
+    if ((formData.foto_produk?.length ?? 0) + uploadedImages.length < 3) {
       alert("Please upload at least 3 images");
       return;
     }
+
     setIsLoading(true);
     try {
       console.log(uploadedImages, "uploaded images");
 
-      const result = await uploadFiles("imageUploader", {
-        files: uploadedImages, // File[]
-      });
-
+      // upload hanya gambar baru
       let urls: string[] = [];
-      if (result.length !== 0) {
-        urls = result.map((el) => el.ufsUrl);
-        setImagesUrls(urls);
+      if (uploadedImages.length > 0) {
+        const result = await uploadFiles("imageUploader", {
+          files: uploadedImages,
+        });
+        if (result.length > 0) {
+          urls = result.map((el) => el.ufsUrl);
+        }
       }
 
-      if (urls.length > 0) {
+      // gabungkan gambar lama (dari DB) + baru (hasil upload)
+      const finalImages = [...(formData.foto_produk || []), ...urls];
+      console.log(finalImages);
+
+      if (finalImages.length > 0) {
         onSubmit(
           formData.kategori ?? "",
           formData.nama_produk ?? "",
           formData.id_produk ?? "",
-          urls
+          finalImages
         );
-      } // Uncomment when ready
+      }
     } catch (error: any) {
       console.log("error happen while creating new product", error.message);
     } finally {
@@ -118,35 +133,28 @@ export function EditProductModal({
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+
+    // simpan file baru
     setUploadedImages((prev) => [...prev, ...files]);
 
-    Promise.all(
-      files.map(
-        (file) =>
-          new Promise<string>((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = (e) => resolve(e.target?.result as string);
-            reader.onerror = (err) => reject(err);
-            reader.readAsDataURL(file);
-          })
-      )
-    ).then((images) => {
-      setFormData((prev) => ({
-        ...prev,
-        foto_produk: [...prev.foto_produk, ...images],
-      }));
-    });
+    // buat URL lokal untuk preview
+    const urls = files.map((file) => URL.createObjectURL(file));
+    setPreviewUrls((prev) => [...prev, ...urls]);
   };
 
   const removeImage = (index: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      foto_produk: (prev.foto_produk ?? []).filter((_, i) => i !== index),
-    }));
-  };
-
-  const handleDragStart = (index: number) => {
-    setDraggedIndex(index);
+    if (index < (formData.foto_produk?.length ?? 0)) {
+      // hapus gambar lama
+      setFormData((prev) => ({
+        ...prev,
+        foto_produk: prev.foto_produk.filter((_, i) => i !== index),
+      }));
+    } else {
+      const previewIndex = index - (formData.foto_produk?.length ?? 0);
+      setPreviewUrls((prev) => prev.filter((_, i) => i !== previewIndex));
+      setUploadedImages((prev) => prev.filter((_, i) => i !== previewIndex));
+    }
   };
 
   const handleDragOver = (e: React.DragEvent, index: number) => {
@@ -240,14 +248,20 @@ export function EditProductModal({
               </label>
             </div>
 
-            {(formData.foto_produk?.length ?? 0) > 0 && (
+            {((formData.foto_produk?.length ?? 0) > 0 ||
+              (previewUrls?.length ?? 0) > 0) && (
               <div className="mt-4">
                 <p className="text-sm text-purple-300 mb-2">
-                  Product Images ({formData.foto_produk?.length ?? 0}/3 minimum)
-                  - Drag to reorder
+                  Product Images (
+                  {(formData.foto_produk?.length ?? 0) +
+                    (previewUrls?.length ?? 0)}
+                  /3 minimum) - Drag to reorder
                 </p>
                 <div className="grid grid-cols-3 gap-2">
-                  {(formData.foto_produk ?? []).map((image, index) => (
+                  {[
+                    ...(formData.foto_produk || []),
+                    ...(previewUrls || []),
+                  ].map((image, index) => (
                     <div
                       key={index}
                       draggable
@@ -286,7 +300,12 @@ export function EditProductModal({
             </Button>
             <Button
               type="submit"
-              disabled={isLoading || (formData.foto_produk?.length ?? 0) < 3}
+              disabled={
+                isLoading ||
+                (formData.foto_produk?.length ?? 0) +
+                  (previewUrls?.length ?? 0) <
+                  3
+              }
               className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg shadow-purple-500/25">
               {isLoading ? "Updating..." : "Update Product"}
             </Button>

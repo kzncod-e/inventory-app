@@ -30,64 +30,6 @@ import { Kategori, Produk, ProdukSortField } from "@/types/type";
 import { getProduct } from "@/lib/product";
 
 // Mock stock data
-const mockStockReport = [
-  {
-    kode_produk: "PRD001",
-    nama_produk: "Wireless Mouse",
-    kategori: "Electronics",
-    jumlah_barang: 120,
-    tgl_update: "2025-08-10",
-  },
-  {
-    kode_produk: "PRD002",
-    nama_produk: "Mechanical Keyboard",
-    kategori: "Electronics",
-    jumlah_barang: 80,
-    tgl_update: "2025-08-12",
-  },
-  {
-    kode_produk: "PRD003",
-    nama_produk: "Office Chair",
-    kategori: "Furniture",
-    jumlah_barang: 45,
-    tgl_update: "2025-08-14",
-  },
-  {
-    kode_produk: "PRD004",
-    nama_produk: "LED Monitor 27 inch",
-    kategori: "Electronics",
-    jumlah_barang: 60,
-    tgl_update: "2025-08-15",
-  },
-  {
-    kode_produk: "PRD005",
-    nama_produk: "Standing Desk",
-    kategori: "Furniture",
-    jumlah_barang: 30,
-    tgl_update: "2025-08-13",
-  },
-  {
-    kode_produk: "PRD006",
-    nama_produk: "USB-C Docking Station",
-    kategori: "Accessories",
-    jumlah_barang: 100,
-    tgl_update: "2025-08-11",
-  },
-  {
-    kode_produk: "PRD007",
-    nama_produk: "Ergonomic Mouse Pad",
-    kategori: "Accessories",
-    jumlah_barang: 200,
-    tgl_update: "2025-08-09",
-  },
-  {
-    kode_produk: "PRD008",
-    nama_produk: "Noise Cancelling Headphones",
-    kategori: "Electronics",
-    jumlah_barang: 75,
-    tgl_update: "2025-08-08",
-  },
-];
 
 type SortDirection = "asc" | "desc" | null;
 
