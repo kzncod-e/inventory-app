@@ -157,30 +157,30 @@ export default function ReportsPage() {
     startIndex + itemsPerPage
   );
 
-  const handleSort = (field: ProdukSortField) => {
-    if (sortField === field) {
-      setSortDirection(
-        sortDirection === "asc"
-          ? "desc"
-          : sortDirection === "desc"
-          ? null
-          : "asc"
-      );
-      if (sortDirection === "desc") {
-        setSortField(null);
-      }
-    } else {
-      setSortField(field);
-      setSortDirection("asc");
-    }
-  };
+  // const handleSort = (field: ProdukSortField) => {
+  //   if (sortField === field) {
+  //     setSortDirection(
+  //       sortDirection === "asc"
+  //         ? "desc"
+  //         : sortDirection === "desc"
+  //         ? null
+  //         : "asc"
+  //     );
+  //     if (sortDirection === "desc") {
+  //       setSortField(null);
+  //     }
+  //   } else {
+  //     setSortField(field);
+  //     setSortDirection("asc");
+  //   }
+  // };
 
-  const getSortIcon = (field: ProdukSortField) => {
-    if (sortField !== field) return <ArrowUpDown className="w-4 h-4" />;
-    if (sortDirection === "asc") return <ArrowUp className="w-4 h-4" />;
-    if (sortDirection === "desc") return <ArrowDown className="w-4 h-4" />;
-    return <ArrowUpDown className="w-4 h-4" />;
-  };
+  // const getSortIcon = (field: ProdukSortField) => {
+  //   if (sortField !== field) return <ArrowUpDown className="w-4 h-4" />;
+  //   if (sortDirection === "asc") return <ArrowUp className="w-4 h-4" />;
+  //   if (sortDirection === "desc") return <ArrowDown className="w-4 h-4" />;
+  //   return <ArrowUpDown className="w-4 h-4" />;
+  // };
 
   const exportToExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(filteredAndSortedData);
@@ -360,7 +360,11 @@ export default function ReportsPage() {
                           </span>
                         </TableCell>
                         <TableCell className="text-gray-200 font-exo font-medium">
-                          {item.stok?.length || 0}
+                          {(item.stok?.length &&
+                            item.stok
+                              .map((el) => el.jumlah_barang)
+                              .reduce((a, b) => a + b, 0)) ||
+                            0}
                         </TableCell>
                         <TableCell className="text-gray-300 font-exo">
                           {new Date(item.tgl_register).toLocaleString("id-ID")}

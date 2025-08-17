@@ -9,8 +9,8 @@ export async function getCategories() {
     if (!res.ok) {
       throw new Error("Failed to fetch categories");
     }
-    const categories = await res.json();
-    return categories;
+    const resJson = await res.json();
+    return resJson.data;
   } catch (error) {
     console.error(error);
     return [];

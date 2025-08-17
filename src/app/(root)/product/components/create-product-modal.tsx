@@ -47,10 +47,6 @@ export function CreateProductModal({
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [uploadedImages, setUploadedImages] = useState<File[]>([]);
   const [imagesUrls, setImagesUrls] = useState<string[]>([]);
-  const uniqueCategories = categories.filter(
-    (cat, index, self) =>
-      index === self.findIndex((c) => c.id_kategori === cat.id_kategori)
-  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -138,7 +134,7 @@ export function CreateProductModal({
     setFormData((prev) => ({ ...prev, foto_produk: newImages }));
     setDraggedIndex(index);
   };
-  const handleCreateProduct = () => {};
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-black/90 backdrop-blur-xl border border-purple-500/30 text-white">
@@ -178,13 +174,15 @@ export function CreateProductModal({
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
                 <SelectContent className="bg-black/90 text-fuchsia-100 border-purple-500/30">
-                  {uniqueCategories.map((category, index) => (
-                    <SelectItem
-                      key={`category-${index}`}
-                      value={category.id_kategori.toString()}>
-                      {category.nama_kategori}
-                    </SelectItem>
-                  ))}
+                  {categories &&
+                    categories.length > 0 &&
+                    categories.map((category, index) => (
+                      <SelectItem
+                        key={`category-${index}`}
+                        value={category.id_kategori.toString()}>
+                        {category.nama_kategori}
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
             </div>
