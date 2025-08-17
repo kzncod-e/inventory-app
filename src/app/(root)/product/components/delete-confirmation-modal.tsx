@@ -9,12 +9,13 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle } from "lucide-react";
+import { Produk } from "@/types/type";
 
 interface DeleteConfirmationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (productId: number) => void;
-  product: any;
+  onConfirm: (productId: string) => void;
+  product: Produk | undefined;
 }
 
 export function DeleteConfirmationModal({
@@ -28,7 +29,8 @@ export function DeleteConfirmationModal({
   const handleConfirm = async () => {
     setIsLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    onConfirm(product.id);
+    if (!product) return;
+    onConfirm(product.id_produk.toString());
     setIsLoading(false);
     onClose();
   };
@@ -49,13 +51,16 @@ export function DeleteConfirmationModal({
           <div className="text-center">
             <img
               src={
-                product.images?.[0] || "/placeholder.svg?height=100&width=100"
+                product.foto_produk[0] ||
+                "/placeholder.svg?height=100&width=100"
               }
-              alt={product.name}
+              alt={product.nama_produk}
               className="w-20 h-20 object-cover rounded-lg mx-auto mb-3 border border-red-500/30"
             />
-            <h3 className="text-lg font-semibold text-white">{product.name}</h3>
-            <p className="text-gray-300">{product.category}</p>
+            <h3 className="text-lg font-semibold text-white">
+              {product.nama_produk}
+            </h3>
+            <p className="text-gray-300">{product.kategori?.nama_kategori}</p>
           </div>
 
           <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4">

@@ -107,3 +107,27 @@ export async function PUT(req: NextRequest) {
     );
   }
 }
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const { id_produk } = await req.json();
+
+    // Hapus produk
+    await prisma.produk.delete({
+      where: { id_produk: Number(id_produk) },
+    });
+
+    return NextResponse.json(
+      {
+        message: "Produk berhasil dihapus",
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json(
+      { message: "Terjadi kesalahan pada server" },
+      { status: 500 }
+    );
+  }
+}

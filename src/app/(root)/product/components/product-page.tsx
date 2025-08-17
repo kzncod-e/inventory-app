@@ -18,7 +18,12 @@ import { CreateProductModal } from "./create-product-modal";
 import { EditProductModal } from "./edit-prodoct-modal";
 import { UpdateStockModal } from "./update-stock-modal";
 import { DeleteConfirmationModal } from "./delete-confirmation-modal";
-import { createProduct, getProduct, updateProduct } from "@/lib/product";
+import {
+  createProduct,
+  deleteProduct,
+  getProduct,
+  updateProduct,
+} from "@/lib/product";
 
 import { Kategori, Product, Produk, StokReq } from "@/types/type";
 import Navbar from "@/components/Navbar";
@@ -106,8 +111,14 @@ export default function ProductManagement() {
     }
   };
 
-  const handleDeleteProduct = (productId: number) => {
-    setProducts((prev) => prev.filter((p) => p.id_produk !== productId));
+  const handleDeleteProduct = async (productId: string) => {
+    try {
+      await deleteProduct(productId);
+      console.log("Product deleted successfully");
+      await getAllProduct(); // Refresh product list after deletion
+    } catch (error) {
+      console.log("Error deleting product:", error);
+    }
   };
 
   const openEditModal = useCallback((product: Produk) => {
@@ -171,33 +182,32 @@ export default function ProductManagement() {
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow className="border-purple-500/30">
-                    <TableHead className="text-purple-300">
-                      Product Image
-                    </TableHead>
-                    <TableHead className="text-purple-300">
-                      Product Name
-                    </TableHead>
-                    <TableHead className="text-purple-300">Category</TableHead>
+              {products.length === 0 ? (
+                <div className="space-y-4">
+                  {[...Array(5)].map((_, i) => (
+                    <div key={i} className="skeleton h-16 rounded"></div>
+                  ))}
+                </div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-purple-500/30">
+                      <TableHead className="text-purple-300">
+                        Product Image
+                      </TableHead>
+                      <TableHead className="text-purple-300">
+                        Product Name
+                      </TableHead>
+                      <TableHead className="text-purple-300">
+                        Category
+                      </TableHead>
 
-                    <TableHead className="text-purple-300">Stock</TableHead>
+                      <TableHead className="text-purple-300">Stock</TableHead>
 
-                    <TableHead className="text-purple-300">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                {products.length === 0 ? (
-                  <TableBody>
-                    <TableRow>
-                      <TableCell
-                        colSpan={4}
-                        className="text-center text-purple-300">
-                        No products found
-                      </TableCell>
+                      <TableHead className="text-purple-300">Actions</TableHead>
                     </TableRow>
-                  </TableBody>
-                ) : (
+                  </TableHeader>
+
                   <TableBody>
                     {filteredProducts.map((product) => (
                       <ProductRow
@@ -209,8 +219,8 @@ export default function ProductManagement() {
                       />
                     ))}
                   </TableBody>
-                )}
-              </Table>
+                </Table>
+              )}
             </div>
           </CardContent>
         </Card>

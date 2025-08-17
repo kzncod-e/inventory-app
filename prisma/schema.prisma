@@ -51,7 +51,7 @@ model Stok {
   tgl_update    DateTime @db.Date
 
   // relasi
-  produk Produk @relation(fields: [id_produk], references: [id_produk])
+  produk Produk @relation(fields: [id_produk], references: [id_produk], onDelete: Cascade)
 
   @@index([id_produk])
   @@map("tbl_stok")
