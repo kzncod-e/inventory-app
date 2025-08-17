@@ -1,8 +1,24 @@
-import { Button } from "@/components/ui/button";
-
 import Navbar from "@/components/Navbar";
+import { getCategories } from "@/lib/category";
+import { Kategori } from "@/types/type";
+import { Produk } from "@/types/type";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const resCategories = await fetch("http://localhost:3000/api/category");
+  const resProducts = await fetch("http://localhost:3000/api/product");
+  const jsonCategories = await resCategories.json();
+  const jsonProducts = await resProducts.json();
+  const categories: Kategori[] = jsonCategories.data ?? [];
+  const products: Produk[] = jsonProducts.data ?? [];
+
+  console.log(categories, "<<< categories array");
+
+  console.log(products, "<<< products array");
+  const totalSemuaStok = products.reduce((acc, el) => {
+    const totalStokProduk =
+      el.stok?.reduce((a, s) => a + s.jumlah_barang, 0) ?? 0;
+    return acc + totalStokProduk;
+  }, 0);
   return (
     <div className="min-h-screen neon-gradient-bg ">
       {/* Animated background overlay */}
@@ -43,7 +59,7 @@ export default function DashboardPage() {
                     <p
                       className="text-2xl font-bold text-white"
                       style={{ fontFamily: "var(--font-orbitron)" }}>
-                      24
+                      {categories.length}
                     </p>
                     <p
                       className="text-gray-300 text-sm"
@@ -76,7 +92,7 @@ export default function DashboardPage() {
                     <p
                       className="text-2xl font-bold text-white"
                       style={{ fontFamily: "var(--font-orbitron)" }}>
-                      1,247
+                      {products.length}
                     </p>
                     <p
                       className="text-gray-300 text-sm"
@@ -109,7 +125,7 @@ export default function DashboardPage() {
                     <p
                       className="text-2xl font-bold text-white"
                       style={{ fontFamily: "var(--font-orbitron)" }}>
-                      89,432
+                      {totalSemuaStok}
                     </p>
                     <p
                       className="text-gray-300 text-sm"
@@ -129,7 +145,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Quick Links Section */}
-            <div className="text-center mb-8">
+            {/* <div className="text-center mb-8">
               <h2
                 className="text-2xl font-bold text-white mb-8"
                 style={{ fontFamily: "var(--font-orbitron)" }}>
@@ -172,7 +188,7 @@ export default function DashboardPage() {
                   <span>VIEW ANALYTICS</span>
                 </Button>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
 
