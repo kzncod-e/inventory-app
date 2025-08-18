@@ -2,6 +2,7 @@ export type Kategori = {
   id_kategori: number;
   nama_kategori: string;
   produk: Produk[];
+  code_category: string;
 };
 
 export type Stok = {

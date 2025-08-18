@@ -36,6 +36,7 @@ export default function ProductManagement() {
 
   const [category, setCategory] = useState<Kategori[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState(searchTerm);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isStockModalOpen, setIsStockModalOpen] = useState(false);
@@ -62,13 +63,24 @@ export default function ProductManagement() {
     getAllProduct();
   }, []);
   console.log("categories", category);
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+    }, 500); // delay 500ms
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchTerm]);
 
   const filteredProducts = products.filter(
     (product) =>
-      product.nama_produk.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.nama_produk
+        .toLowerCase()
+        .includes(debouncedSearch.toLowerCase()) ||
       product.kategori?.nama_kategori
         .toLowerCase()
-        .includes(searchTerm.toLowerCase())
+        .includes(debouncedSearch.toLowerCase())
   );
 
   const handleCreateProduct = async (newProduct: Product) => {

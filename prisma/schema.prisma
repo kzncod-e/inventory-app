@@ -21,7 +21,7 @@ model Kategori {
   id_kategori   Int      @id @default(autoincrement())
   nama_kategori String   @db.VarChar(200)
 
-  // relasi
+  code_category String    @default("UNCODED")
   produk        Produk[]
 
   @@map("tbl_kategori")

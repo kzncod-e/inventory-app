@@ -16,14 +16,17 @@ export async function getCategories() {
     return [];
   }
 }
-export async function createCategory(nama_kategori: string) {
+export async function createCategory(
+  nama_kategori: string,
+  code_category: string
+) {
   try {
     const res = await fetch("/api/category", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ nama_kategori }),
+      body: JSON.stringify({ nama_kategori, code_category }),
     });
     if (!res.ok) {
       throw new Error("Failed to create category");

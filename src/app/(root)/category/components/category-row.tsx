@@ -17,6 +17,11 @@ const CategoryRow = React.memo(
             {category.nama_kategori}
           </span>
         </td>
+        <td className="py-4 px-4">
+          <span className="text-white font-medium">
+            {category.code_category}
+          </span>
+        </td>
 
         <td className="py-4 px-4">
           <span

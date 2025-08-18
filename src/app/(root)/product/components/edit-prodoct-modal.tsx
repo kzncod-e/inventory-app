@@ -90,7 +90,10 @@ export function EditProductModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if ((formData.foto_produk?.length ?? 0) + uploadedImages.length < 3) {
+    const oldImages = formData.foto_produk?.length || 0;
+    const newImages = uploadedImages.length;
+
+    if (oldImages + newImages < 3) {
       alert("Please upload at least 3 images");
       return;
     }

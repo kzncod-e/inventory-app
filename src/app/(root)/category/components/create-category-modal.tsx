@@ -16,7 +16,7 @@ import { Label } from "@/components/ui/label";
 interface CreateCategoryModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (nama_kategori: string) => Promise<void>;
+  onSubmit: (nama_kategori: string, code_category: string) => Promise<void>;
 }
 
 export function CreateCategoryModal({
@@ -24,7 +24,7 @@ export function CreateCategoryModal({
   onClose,
   onSubmit,
 }: CreateCategoryModalProps) {
-  const [formData, setFormData] = useState({ name: "" });
+  const [formData, setFormData] = useState({ name: "", code_category: "" });
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ name?: string }>({});
 
@@ -41,9 +41,15 @@ export function CreateCategoryModal({
       name,
     }));
   };
+  const handleCodeChange = (code_category: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      code_category,
+    }));
+  };
 
   const validateForm = () => {
-    const newErrors: { name?: string } = {};
+    const newErrors: { name?: string; code_category?: string } = {};
 
     if (!formData.name.trim()) {
       newErrors.name = "Category name is required";
@@ -60,8 +66,8 @@ export function CreateCategoryModal({
 
     setIsLoading(true);
     try {
-      await onSubmit(formData.name);
-      setFormData({ name: "" });
+      await onSubmit(formData.name, formData.code_category);
+      setFormData({ name: "", code_category: "" });
       setErrors({});
       onClose();
     } catch (error: any) {
@@ -72,7 +78,7 @@ export function CreateCategoryModal({
   };
 
   const handleClose = () => {
-    setFormData({ name: "" });
+    setFormData({ name: "", code_category: "" });
     setErrors({});
     onClose();
   };
@@ -101,6 +107,18 @@ export function CreateCategoryModal({
             {errors.name && (
               <p className="text-red-400 text-sm mt-1">{errors.name}</p>
             )}
+          </div>
+          <div>
+            <Label className="text-white font-semibold mb-2 block">
+              Category Code
+            </Label>
+            <Input
+              value={formData.code_category}
+              onChange={(e) => handleCodeChange(e.target.value)}
+              className="bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-purple-500 focus:ring-purple-500/50"
+              placeholder="Enter category code"
+              required
+            />
           </div>
 
           {/* <div>

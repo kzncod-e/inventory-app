@@ -60,8 +60,11 @@ function ProductRowComponent({
       {/* Stok */}
       <TableCell className="text-white">
         {product.stok
-          ? product.stok.length > 0 &&
-            product.stok.map((s) => s.jumlah_barang).reduce((a, b) => a + b, 0)
+          ? product.stok.length > 0
+            ? product.stok
+                .map((s) => s.jumlah_barang)
+                .reduce((a, b) => a + b, 0)
+            : 0
           : 0}{" "}
         pcs
       </TableCell>

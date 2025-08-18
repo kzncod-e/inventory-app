@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { log } from "console";
 
 const prisma = new PrismaClient();
 
@@ -23,11 +24,13 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const { nama_kategori } = await req.json();
+  const { nama_kategori, code_category } = await req.json();
+  console.log("Creating category:", { nama_kategori, code_category });
 
   const category = await prisma.kategori.create({
     data: {
       nama_kategori,
+      code_category,
     },
   });
 

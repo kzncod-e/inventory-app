@@ -53,17 +53,25 @@ export default function CategoryManagement() {
       setCategories,
     });
   }, []);
-
   useEffect(() => {
-    const filtered = categories.filter((category) =>
-      category.nama_kategori.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredCategories(filtered);
+    const handler = setTimeout(() => {
+      const filtered = categories.filter((category) =>
+        category.nama_kategori.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredCategories(filtered);
+    }, 500); // 500ms debounce
+
+    return () => {
+      clearTimeout(handler); // clear timeout kalau user masih ngetik
+    };
   }, [categories, searchTerm]);
 
-  const handleCreateCategory = async (nama_kategori: string) => {
+  const handleCreateCategory = async (
+    nama_kategori: string,
+    code_category: string
+  ) => {
     try {
-      const res = await createCategory(nama_kategori);
+      const res = await createCategory(nama_kategori, code_category);
       if (res) {
         showToast("Kategori berhasil ditambahkan", "success");
         await getAllCategories({
@@ -217,6 +225,9 @@ export default function CategoryManagement() {
                     <tr className="border-b border-white/20">
                       <th className="text-left py-4 px-4 text-white font-semibold">
                         Category Name
+                      </th>
+                      <th className="text-left py-4 px-4 text-white font-semibold">
+                        Category Code
                       </th>
 
                       <th className="text-left py-4 px-4 text-white font-semibold">
